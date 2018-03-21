@@ -1,18 +1,46 @@
 defmodule Theater.Stopper do
+  @moduledoc false
+
   use GenServer
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
+  @doc """
+  Indicate that the given Actor pid has been used recently.
+
+  When it's time to get free up memory, get rid of the older things first. This
+  method records that the given pid just got used and is thus not one of the
+  older things.
+
+  This module may be redefined as a behaviour so that the stopping method can
+  be pluggable
+  """
   def touch(pid) do
     GenServer.cast(__MODULE__, {:touch, pid})
   end
 
+  @doc """
+  Mark the given Actor pid as done.
+
+  This should free up its memory.
+
+  This module may be redefined as a behaviour so that the stopping method can
+  be pluggable
+  """
   def mark_as_done(pid) do
     GenServer.cast(__MODULE__, {:remove, pid})
   end
 
+  @doc """
+  Check for old Actors and clean them out.
+
+  This implementation cleans out the oldest Actors until more than 20% memory is available. Other implementations may use other heuristics in the future.
+
+  This module may be redefined as a behaviour so that the stopping method can
+  be pluggable
+  """
   def clean() do
     GenServer.cast(__MODULE__, :clean)
   end

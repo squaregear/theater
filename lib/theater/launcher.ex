@@ -1,4 +1,6 @@
 defmodule Theater.Launcher do
+  @moduledoc false
+
   use GenServer
 
   alias Theater.Actor
@@ -7,6 +9,13 @@ defmodule Theater.Launcher do
     GenServer.start_link(__MODULE__, persister, name: __MODULE__)
   end
 
+  @doc """
+  This sends the message to a local instance of an Actor.
+
+  It is assumed here that this is the proper insance for this Actor to live on.
+  Theater should have found the right node and then called this function on
+  that node.
+  """
   def send(module, id, message) do
     case send_if_present(module, id, message) do
       :ok -> :ok
@@ -14,6 +23,14 @@ defmodule Theater.Launcher do
     end
   end
 
+  @doc """
+  Stops actors running on this node that look like they should be on another.
+
+  Theater will kill Actors running on the current node when it hears about a
+  new node. Anything that should be on that new node should, by extension, not
+  be running on this node. Theater starts that action, but Launcher knows more
+  about what's running here, so this is where the actual check is done.
+  """
   def stop_actors_for(node) do
     :ets.foldl(fn({key, pid}, _) ->
         remove_if_remote(key, pid, node)

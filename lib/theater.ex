@@ -121,5 +121,6 @@ defmodule Theater do
   #   two nodes to come up at the same time and both miss each other's existence
   # zzz how do you identify old data and free up that memory?
   # zzz how do you connect mnesia nodes and get them in synch?
+  # zzz versioned persistence storage for optimistic concurrency
 
 end
