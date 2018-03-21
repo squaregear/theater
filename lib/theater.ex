@@ -47,7 +47,7 @@ defmodule Theater do
 
   # Callbacks ################################################
 
-  def init(_) do
+  def init(is_server) do
     :net_kernel.monitor_nodes(true)
     case :ets.info(__MODULE__.State, :name) do
       :undefined ->
@@ -56,27 +56,32 @@ defmodule Theater do
     end
     build_node_list()
     |> Enum.each(&announce_self/1)
-    {:ok, nil}
+    {:ok, is_server}
   end
 
-  def handle_cast({:reload_nodes, new_node}, _) do
+  def handle_cast({:reload_nodes, new_node}, is_server) do
     build_node_list()
-    spawn(fn() -> Launcher.stop_actors_for(new_node) end)
-    {:noreply, nil}
+    if is_server do
+      spawn(fn() -> Launcher.stop_actors_for(new_node) end)
+    end
+    {:noreply, is_server}
   end
 
-  def handle_info({:nodeup, n}, _) do
+  def handle_info({:nodeup, n}, is_server) do
     # zzz This seems to get here before Theater is running on the other node
     # so do we even do this, since it's going to announce itself anyway?
     build_node_list()
-    {:noreply, nil}
+    if is_server do
+      announce_self(n)
+    end
+    {:noreply, is_server}
   end
-  def handle_info({:nodedown, n}, _) do
+  def handle_info({:nodedown, _n}, is_server) do
     build_node_list()
-    {:noreply, nil}
+    {:noreply, is_server}
   end
-  def handle_info(_, _) do
-    {:noreply, nil}
+  def handle_info(_, is_server) do
+    {:noreply, is_server}
   end
 
   # Support ###############################################

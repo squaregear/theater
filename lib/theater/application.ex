@@ -21,17 +21,18 @@ defmodule Theater.Application do
       {Theater.Storage.MnesiaDisk, []}
     )
 
-    theater_children=if Application.get_env(:theater, :client_only, false) do
-      []
-    else
+    is_server=not(Application.get_env(:theater, :client_only, false))
+    theater_children=if is_server do
       [
         Supervisor.child_spec({persister, persister_opts},[]),
         Supervisor.child_spec({Theater.Launcher, persister},[]),
         Supervisor.child_spec({Theater.Stopper, nil},[]),
       ]
+    else
+      []
     end
 
-    children=theater_children ++ [Supervisor.child_spec({Theater, []},[])]
+    children=theater_children ++ [Supervisor.child_spec({Theater, is_server},[])]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
