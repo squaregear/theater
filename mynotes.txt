@@ -15,3 +15,11 @@ If you know the other nodes to look for, you can configure them in your config f
 config :kernel,
   sync_nodes_optional: [:"notifier@ql1notifyprod1.mi.corp.rockfin.com", :"notifier@ql2notifyprod1.mi.corp.rockfin.com"],
   sync_nodes_timeout: 10000
+
+
+
+Publishing in Hex:
+https://hex.pm/docs/publish
+
+set MIX_ENV=docs
+mix docs

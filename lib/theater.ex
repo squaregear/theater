@@ -1,16 +1,25 @@
 defmodule Theater do
+  @moduledoc """
+  This is the main module through which you send messages to actors.
+  """
+
   use GenServer
 
   alias Theater.Launcher
 
-  @moduledoc """
-  Documentation for Theater.
-  """
-
+  @doc false
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
+  @doc """
+  Send `message` to an actor.
+
+  `module` must be the name of a module that implements the `Theater.Actor`
+  behavior. `id` is any term that you want to use to identify the actor to
+  receive the message. Actors are identified by {module, id} pairs, so actors
+  of different `module` types can have the same `id`.
+  """
   def send(module, id, message) do
     [{:nodes, node_list}]=:ets.lookup(__MODULE__.State, :nodes)
     node_list
@@ -18,10 +27,15 @@ defmodule Theater do
     |> launch(module, id, message)
   end
 
+  @doc false
   def reload_nodes(new_node \\ nil) do
     GenServer.cast(__MODULE__, {:reload_nodes, new_node})
   end
 
+  @doc """
+  Gets the node from `list` that an actor of type `module` with `id` should
+  live on.
+  """
   def get_target_node(list, module, id) do
     list
     |> Enum.reduce({nil, 0}, fn(n, acc) -> replace_max(n, acc, module, id) end)
@@ -54,13 +68,10 @@ defmodule Theater do
   def handle_info({:nodeup, n}, _) do
     # zzz This seems to get here before Theater is running on the other node
     # so do we even do this, since it's going to announce itself anyway?
-    IO.puts("(#{node()}) New node: #{n}")
-    IO.inspect(Node.list())
     build_node_list()
     {:noreply, nil}
   end
   def handle_info({:nodedown, n}, _) do
-    IO.puts("(#{node()}) Lost node: #{n}")
     build_node_list()
     {:noreply, nil}
   end
@@ -72,7 +83,9 @@ defmodule Theater do
   
   defp build_node_list() do
     theater_nodes=[node() | Node.list()]
-    |> Enum.filter(fn(n) -> :rpc.call(n, Process, :whereis, [Theater])!=nil end)
+    |> Enum.filter(fn(n) ->
+      :rpc.call(n, Process, :whereis, [Theater.Launcher])!=nil
+    end)
     :ets.insert(__MODULE__.State, {:nodes, theater_nodes})
     theater_nodes
   end
