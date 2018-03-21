@@ -1,0 +1,17 @@
+start sessions like:
+
+iex --name foo --cookie cookie -S mix
+
+to see the name of this node:
+node()
+
+to see the other nodes:
+Node.list()
+
+to explicitly connect to another node:
+Node.connect(:"foo@877JWF2.mi.corp.rockfin.com")
+
+If you know the other nodes to look for, you can configure them in your config files like this:
+config :kernel,
+  sync_nodes_optional: [:"notifier@ql1notifyprod1.mi.corp.rockfin.com", :"notifier@ql2notifyprod1.mi.corp.rockfin.com"],
+  sync_nodes_timeout: 10000
