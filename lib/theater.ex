@@ -68,8 +68,9 @@ defmodule Theater do
   end
 
   def handle_info({:nodeup, n}, is_server) do
-    # zzz This seems to get here before Theater is running on the other node
-    # so do we even do this, since it's going to announce itself anyway?
+    # zzz This seems to get here before Theater is running on the other node so
+    # do we even do build the node list, since it's going to announce itself
+    # anyway?
     build_node_list()
     if is_server do
       announce_self(n)
@@ -115,12 +116,10 @@ defmodule Theater do
 
   # zzz how do you agree on actual cluster membership?
   #   I am handling this in a very naive way. If there is a cluster partition
-  #   your data could very easily get out of sync. This will amoun to looking
+  #   your data could very easily get out of sync. This will amount to looking
   #   like undelivered messages.
   # zzz Even with my naive membership plan, I still wonder if it's possible for
   #   two nodes to come up at the same time and both miss each other's existence
-  # zzz how do you identify old data and free up that memory?
-  # zzz how do you connect mnesia nodes and get them in synch?
   # zzz versioned persistence storage for optimistic concurrency
 
 end
