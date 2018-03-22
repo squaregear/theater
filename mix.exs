@@ -46,7 +46,7 @@ defmodule Theater.Mixfile do
         "GitHub" => "https://github.com/squaregear/theater",
         "Online Documentation" => "https://hexdocs.pm/theater",
       },
-      files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
+      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
     ]
   end
 
