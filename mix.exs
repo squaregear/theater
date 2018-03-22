@@ -51,11 +51,11 @@ defmodule Theater.Mixfile do
 
   defp docs() do
     [
-      main: "introduction",
+      main: "overview",
       source_url: "https://github.com/squaregear/theater",
       extra_section: "GUIDE",
       extras: [
-        "docs/introduction.md",
+        "docs/overview.md",
       ]
     ]
   end
