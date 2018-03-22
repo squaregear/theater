@@ -44,19 +44,18 @@ defmodule Theater.Mixfile do
       maintainers: ["Matthew Welch"],
       links: %{
         "GitHub" => "https://github.com/squaregear/theater",
-        "Online Documentation" => "https://hexdocs.pm/theater",
       },
-      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
+      files: ["lib", "docs", "mix.exs", "README.md", "LICENSE.md"],
     ]
   end
 
   defp docs() do
     [
-      main: "Introduction",
+      main: "introduction",
       source_url: "https://github.com/squaregear/theater",
       extra_section: "GUIDE",
       extras: [
-        "docs/Introduction.md",
+        "docs/introduction.md",
       ]
     ]
   end
