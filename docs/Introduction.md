@@ -29,3 +29,60 @@ Erlang's built-in clustering. Erleans implements actors with a very
 GenServer-like interface. I aimed for more of a pure actor model with only
 message passing for communication and a very simple behaviour for actors to
 implement.
+
+## Usage
+
+Create Actors by defining modules with the Theater.Actor behaviour. For
+convienience, modules can `use Theater.Actor` and have some default
+implementations provided for them. Here is an example of a simple Actor that
+keeps a counter. See `Theater.Actor` for more information about the Actor
+behaviour and the values the callbacks should return.
+
+    defmodule Counter do
+      use Theater.Actor
+
+      def init(id, message) do
+        process(0, id, message)
+      end
+
+      def process(i, _id, :increment) do
+        {:ok, i+1}
+      end
+      def process(i, id, {:get, pid}) do
+        send(pid, {:counter, id, i})
+        {:ok, i}
+      end
+      def process(_i, _id, :done) do
+        :stop
+      end
+
+    end
+
+Then use your Actors by sending them messages:
+
+    Theater.send(Counter, :dogs, :increment)
+    Theater.send(Coutner, :cats, :increment)
+    Theater.send(Counter, :dogs, :increment)
+
+    Theater.send(Counter, :dogs, {:get, self()})
+    Theater.send(Counter, :dogs, :done)
+
+Actors are addressed by their type (module) and ID. IDs can be any term you
+want to use, so strings, atoms, and integers are all valid.
+
+You do not have to worry about which node of your cluster they are running on,
+or what happens to them when you add or remove nodes to scale your cluster up
+and down. Theater takes care of starting and stopping those processes. You just
+send messages to your Actors by ID and Theater takes care of the rest.
+
+## Theater Client
+
+To have access to your Actors from a node that is not running Theater itself,
+include Theater as a dependency and then add an option like this to your
+config.exs:
+
+    config :theater, :client_only, true
+
+Then you will still be able to use `Theater.send()` to send messages to your
+Actors, but that node will not host Actors itself. This way some node of your
+cluster could host Actors and other could, say, run Phoenix.

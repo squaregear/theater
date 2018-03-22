@@ -49,7 +49,10 @@ be found at [https://hexdocs.pm/theater](https://hexdocs.pm/theater).
 
 ## Usage
 
-Create Actors by defining modules with the Theater.Actor behaviour. For convienience, modules can `use Theater.Actor` and have some default implementations provided for them. Here is an example of a simple Actor that keeps a counter.
+Create Actors by defining modules with the Theater.Actor behaviour. For
+convienience, modules can `use Theater.Actor` and have some default
+implementations provided for them. Here is an example of a simple Actor that
+keeps a counter.
 
     defmodule Counter do
       use Theater.Actor
@@ -79,3 +82,23 @@ And here is how you might use it.
 
     Theater.send(Counter, :dogs, {:get, self()})
     Theater.send(Counter, :dogs, :done)
+
+Actors are addressed by their type (module) and ID. IDs can be any term you
+want to use, so strings, atoms, and integers are all valid.
+
+You do not have to worry about which node of your cluster they are running on,
+or what happens to them when you add or remove nodes to scale your cluster up
+and down. Theater takes care of starting and stopping those processes. You just
+send messages to your Actors by ID and Theater takes care of the rest.
+
+## Theater Client
+
+To have access to your Actors from a node that is not running Theater itself,
+include Theater as a dependency and then add an option like this to your
+config.exs:
+
+    config :theater, :client_only, true
+
+Then you will still be able to use `Theater.send()` to send messages to your
+Actors, but that node will not host Actors itself. This way some node of your
+cluster could host Actors and other could, say, run Phoenix.

@@ -1,14 +1,31 @@
 defmodule Theater.Storage.MnesiaDisk do
+  @moduledoc """
+  A simple Mnesia storage implementation for experimenting.
+
+  This is a very simple storage implementation provided for out-of-the-box
+  experimental usage. It is **not recommended** for actual production use.
+  Mnesia has significant issues with scaling, and only exists within the
+  cluster itself, which can lead to problems when nodes are added or removed,
+  and in a "split brain" scenario it completely defeats the purpose of the
+  persistence storage.  It is included only because Mnesia comes in the box
+  with Erlang and it is sufficient to play with for understanding how Theater
+  works. Please do not consider it anything more than a toy implementation.
+  """
+
   use GenServer
 
   require Logger
 
   @behaviour Theater.Storage
 
+  @doc false
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
+  @doc """
+  Retrieves the state of the given Actor.
+  """
   def get(module, id) do
     case :mnesia.dirty_read({__MODULE__, {module, id}}) do
       [] -> :not_present
@@ -17,12 +34,18 @@ defmodule Theater.Storage.MnesiaDisk do
     end
   end
 
+  @doc """
+  Stores the state of the given Actor.
+  """
   def put(module, id, state) do
     :mnesia.dirty_write({__MODULE__, {module, id}, state})
     # zzz what happens if this fails?
     :ok
   end
 
+  @doc """
+  Removes the Actor's state.
+  """
   def delete(module, id) do
     :mnesia.dirty_delete({__MODULE__, {module, id}})
     # zzz what happens if this fails?
@@ -31,6 +54,7 @@ defmodule Theater.Storage.MnesiaDisk do
 
   # Callbacks ################################################
 
+  @doc false
   def init(_opts) do
     :mnesia.start()
     schema_on_disk()
@@ -47,6 +71,7 @@ defmodule Theater.Storage.MnesiaDisk do
 
   defstruct key: :nil, val: :nil
 
+  @doc false
   defmodule Item do
     defstruct key: :nil, val: :nil
   end

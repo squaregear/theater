@@ -12,13 +12,13 @@ defmodule Theater.Storage do
   types.
 
   A default storage implementation, `Theater.Storage.MnesiaDisk`, is provided
-  with Theater, but it is not recommended for actual production use. Mnesia has
-  significant issues with scaling, and only exists within the cluster itself,
-  which can lead to problems when nodes are added or removed, and in a "split
-  brain" scenario it completely defeats the purpose of the persistence storage.
-  It is included only because Mnesia comes in the box with Erlang and it is
-  sufficient to play with for understanding how Theater works. Please do not
-  consider it anything more than a toy implementation.
+  with Theater, but it is **not recommended** for actual production use. Mnesia
+  has significant issues with scaling, and only exists within the cluster
+  itself, which can lead to problems when nodes are added or removed, and in a
+  "split brain" scenario it completely defeats the purpose of the persistence
+  storage.  It is included only because Mnesia comes in the box with Erlang and
+  it is sufficient to play with for understanding how Theater works. Please do
+  not consider it anything more than a toy implementation.
 
   Modules that implement this behaviour must implement all three methods. There
   are no suitable defaults.
